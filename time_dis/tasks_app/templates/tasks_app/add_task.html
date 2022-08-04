@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %} Создание задачи {% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 15px">
+    <form method="post">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <br>
+        <div class="form-group">
+            <input type="submit" class="btn btn-outline-success" value="Создать задачу">
+        </div>
+    </form>
+</div>
+{% endblock %}

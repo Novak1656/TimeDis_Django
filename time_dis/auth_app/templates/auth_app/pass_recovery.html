@@ -1,0 +1,46 @@
+{% extends 'auth_app/base_auth_app.html' %}
+
+{% block title %} Восстановление пароля {% endblock %}
+
+{% block content %}
+
+<div class="border-bottom">
+    {% if form %}
+    <p class="display-6">Шаг 2:</p>
+    <p class="">Создайте новый пароль.</p>
+    {% else %}
+    <p class="display-6">Шаг 1:</p>
+    <p class="">Введите адрес электронной почты, который вы указывали при регистрации для получения дальнейших инструкций по восстановлению пароля.</p>
+    {% endif %}
+</div>
+<div class="container w-50">
+    <form method="post">
+        {% csrf_token %}
+        {% if form %}
+        <div class="form-group mt-4">
+            {{ form.as_p }}
+        </div>
+        <div class="text-center mt-3">
+            <input type="submit" class="btn btn-success" value="Подтвердить">
+        </div>
+        {% else %}
+        <div class="form-group mt-4">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    {% if message.tags %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <span>Email:</span>
+            <input type="email" class="form-control" name="email" placeholder="Введите адрес электронной почты...">
+        </div>
+        <div class="text-center mt-3">
+            <input type="submit" class="btn btn-success" value="Отправить">
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
