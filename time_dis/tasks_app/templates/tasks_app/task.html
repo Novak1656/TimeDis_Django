@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ task.title }} {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1 class="display-5">{{ task.title }}</h1>
+        <span>
+        <p>Категория: {{ task.category }}</p>
+    </span>
+        <p class="display-7">{{ task.comment }}</p>
+        <span class="">
+        <p>Срок выполнения: {{ task.deadline|date:"d.m.Y" }}</p>
+    </span>
+        <div class="btn-group btn-group-horizontal">
+            <a href="{% url 'update_task' task.slug %}" class="btn btn-outline-warning">Редактировать</a>
+            <a href="{% url 'delete_task' task.slug %}" class="btn btn-outline-danger">Удалить</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

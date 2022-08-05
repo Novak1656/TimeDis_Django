@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.urls import reverse_lazy
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -130,3 +132,5 @@ EMAIL_HOST_USER = 'TimeDis.app@gmail.com'
 EMAIL_HOST_PASSWORD = 'fnxtrijisfzhtyrx'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+
+LOGIN_URL = 'login'

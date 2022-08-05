@@ -3,5 +3,47 @@
 {% block title %} Мои {% endblock %}
 
 {% block content %}
-
+<div class="container">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <h1>Ваши {{ title }}:</h1>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#search" aria-controls="search" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </div>
+    </nav>
+    <div class="collapse" id="search">
+        <form method="get" class="d-flex" action="">
+            <div class="input-group">
+                <input type='text' class="bg-white text-white form-control" name="search_word" list="search_name" placeholder="Поиск...">
+                <datalist id="search_name">
+                    {% for task in tasks %}<option value="{{ task.title }}">{% endfor %}
+                </datalist>
+                <button type="submit" name="search" value="search" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+        <br>
+        <div class="btn-group border-top border-bottom rounded w-100">
+            <div class="row">
+                <div class="col border-end">
+                    <h3>Фильтры:</h3>
+                <a href="" class="btn btn-outline-info mb-2">По названию</a>
+                <a href="" class="btn btn-outline-info mb-2">По дате создания</a>
+                <a href="" class="btn btn-outline-info mb-2">По сроку выполнения</a>
+                </div>
+                <div class="col-lg-3">
+                    <h3>Разделы:</h3>
+                    <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split mb-2" data-bs-toggle="dropdown" aria-expanded="false">Задачи по категориям</button>
+                    <ul class="dropdown-menu">
+<!--                        {% for genre in genres %}-->
+<!--                        <li><a class="dropdown-item" href="{% url 'main' %}?genre_name={{ genre.title }}&{{ author_name }}">{{ genre.title }}</a></li>-->
+<!--                        {% endfor %}-->
+                    </ul>
+                    <a href="" class="btn btn-outline-danger mb-2">Задачи по приоритету</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block body %} {% endblock %}
+</div>
 {% endblock %}

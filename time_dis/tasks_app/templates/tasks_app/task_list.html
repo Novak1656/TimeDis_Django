@@ -1,47 +1,35 @@
 {% extends 'tasks_app/base_tasks_app.html' %}
 
-{% block title %} {{ block.super }} задачи {% endblock %}
+{% block title %} {{ block.super }} {{ title }} {% endblock %}
 
-{% block content %}
-<div class="container">
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <h1>Ваши задачи:</h1>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#search" aria-controls="search" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="bi bi-chevron-down"></i>
-            </button>
+{% block body %}
+<div class="album py-5 bg-dark rounded">
+    <div class="container">
+        <div class="row gy-5">
+            {% for task in tasks %}
+            <div class="col" align="center">
+                <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
+                    <div class="card-header border-bottom bg-{{ task.priority.tag }}">
+                        <h1 class="card-text display-6">{{ task.category }}</h1>
+                        <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right"></a>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-text display-6">{{ task.title|title }}</h1>
+                        <p class="card-text">Срок выполнения: до {{ task.deadline }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group w-100">
+                            <a class="btn btn-outline-info w-100" href="{{ task.get_absolute_url }}">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center display-6">У вас ещё нет задач
+                <br><a class="btn btn-outline-success w-25 text-center mt-3" href="{% url 'add_task' %}">Создать задачу</a>
+            </p>
+            {% endfor %}
         </div>
-    </nav>
-    <div class="collapse" id="search">
-        <form class="d-flex" method="post">
-            <input class="form-control mr-2" list="search_name" name="search_title" placeholder="Поиск...">&nbsp
-            <datalist id="search_name">
-                {% for task in tasks %}
-                    <option value="{{ task.title }}">
-                {% endfor %}
-            </datalist>
-            <button class="btn btn-floating btn-outline-success mr-1" name="search" type="submit" value="Поиск"><i class="bi bi-search"></i></button>
-        </form>
-        <br>
     </div>
-
-    {% if tasks|length > 0 %}
-        {% for task in tasks %}
-    <div class="alert alert-{{ elm.priory }} border">
-        <h2>{{ task.title }}</h2>
-        <p><b>Дата события: {{ task.deadline|date:"d.m.Y H:i:s" }}</b></p>
-
-
-        <div class="btn-group" role="group" aria-label="btn_group">
-            <a class="btn btn-outline-info" name="id_update" href="get_absolute_url">Подробнее</a>
-            <a type="submit" class="btn btn-outline-danger" name="id_delete" value="">Удалить</a>
-        </div>
-
-    </div>
-        {% endfor %}
-    {% else %}
-    <p>У вас нет задач</p>
-    <a class="btn btn-success" href="{% url 'add_task' %}">Создать задачу</a>
-    {% endif %}
 </div>
 {% endblock %}

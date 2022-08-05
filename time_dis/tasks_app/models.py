@@ -1,5 +1,9 @@
+from django_unique_slugify import unique_slugify
+from unidecode import unidecode
 from django.db import models
 from auth_app.models import Users
+from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Categories(models.Model):
@@ -15,7 +19,8 @@ class Categories(models.Model):
 
 
 class Priority(models.Model):
-    title = models.CharField('Название', max_length=250)
+    title = models.CharField('Название', max_length=250, default='Важно-срочно')
+    tag = models.CharField('Тег', max_length=100, default='danger')
 
     class Meta:
         verbose_name = 'Приоритет'
@@ -27,10 +32,11 @@ class Priority(models.Model):
 
 
 class Tasks(models.Model):
+    slug = models.SlugField(max_length=250, null=True, allow_unicode=True)
     title = models.CharField('Название', max_length=250)
     comment = models.TextField('Подробности', blank=True)
-    category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='tasks')
-    priority = models.ForeignKey(Priority, on_delete=models.PROTECT, related_name='tasks')
+    category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='tasks', verbose_name='Категория')
+    priority = models.ForeignKey(Priority, on_delete=models.PROTECT, related_name='tasks', verbose_name='Приоритет')
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='tasks')
     deadline = models.DateTimeField('Срок выполнения', blank=True, null=True)
     created_on = models.DateTimeField('Дата создания', auto_now_add=True)
@@ -41,8 +47,17 @@ class Tasks(models.Model):
         verbose_name_plural = 'Задачи'
         ordering = ['-created_on']
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            unique_slugify(self, slugify(unidecode(self.title)))
+        super(Tasks, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('task', kwargs={'slug': self.slug})
+
     def __str__(self):
         return f"{self.user}: {self.title}"
+
 
 
 '''
