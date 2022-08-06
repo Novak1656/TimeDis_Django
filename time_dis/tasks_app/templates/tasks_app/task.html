@@ -5,7 +5,9 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <h1 class="display-5">{{ task.title }}</h1>
+        <div class="bg-{{ task.priority.tag }}">
+            <h1 class="display-5">{{ task.title }}</h1>
+        </div>
         <span>
         <p>Категория: {{ task.category }}</p>
     </span>

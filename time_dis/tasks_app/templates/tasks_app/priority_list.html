@@ -1,0 +1,11 @@
+<button type="button" class="btn btn-outline-danger dropdown-toggle dropdown-toggle-split mb-2" data-bs-toggle="dropdown" aria-expanded="false">Задачи по приоритету</button>
+<ul class="dropdown-menu dropdown-menu-right">
+    {% for priority in priorities %}
+        <li>
+            <a class="dropdown-item" href="">
+            {{ priority.title }}
+            &nbsp<span class="badge bg-danger rounded-pill">{{ priority.cnt }}</span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>

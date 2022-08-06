@@ -1,0 +1,12 @@
+<button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split mb-2" data-bs-toggle="dropdown" aria-expanded="false">Задачи по категориям</button>
+<ul class="dropdown-menu dropdown-menu-right">
+    {% for category in categories %}
+        <li>
+            <a class="dropdown-item" href="">
+            {{ category.title }}
+            &nbsp<span class="badge bg-danger rounded-pill">{{ category.cnt }}</span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+

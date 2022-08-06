@@ -1,0 +1,7 @@
+{% for filter, label in filers_list %}
+    {% if filter == filter_by|slice:"11:" %}
+        <a href="{{ url }}" class="btn btn-outline-info mb-2 active">{{ label }}</a>
+    {% else %}
+        <a href="{{ url }}?filter_by={{ filter }}" class="btn btn-outline-info mb-2">{{ label }}</a>
+    {% endif %}
+{% endfor %}

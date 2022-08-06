@@ -15,7 +15,7 @@
                     </div>
                     <div class="card-body">
                         <h1 class="card-text display-6">{{ task.title|title }}</h1>
-                        <p class="card-text">Срок выполнения: до {{ task.deadline }}</p>
+                        <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y" }}</p>
                     </div>
                     <div class="card-footer">
                         <div class="btn-group w-100">

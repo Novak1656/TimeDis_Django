@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load task_tags %}
 
 {% block title %} Мои {% endblock %}
 
@@ -13,9 +14,9 @@
         </div>
     </nav>
     <div class="collapse" id="search">
-        <form method="get" class="d-flex" action="">
+        <form method="get" class="d-flex" action="{% url 'task_search' %}">
             <div class="input-group">
-                <input type='text' class="bg-white text-white form-control" name="search_word" list="search_name" placeholder="Поиск...">
+                <input type='text' class="bg-white form-control" name="search_word" list="search_name" placeholder="Поиск...">
                 <datalist id="search_name">
                     {% for task in tasks %}<option value="{{ task.title }}">{% endfor %}
                 </datalist>
@@ -27,23 +28,51 @@
             <div class="row">
                 <div class="col border-end">
                     <h3>Фильтры:</h3>
-                <a href="" class="btn btn-outline-info mb-2">По названию</a>
-                <a href="" class="btn btn-outline-info mb-2">По дате создания</a>
-                <a href="" class="btn btn-outline-info mb-2">По сроку выполнения</a>
+                    {% for filter, label in filers_list %}
+                        {% if filter == filter_by|slice:"11:" %}
+                            <a href="{% url 'my_tasks' %}" class="btn btn-outline-info mb-2 active">{{ label }}</a>
+                        {% else %}
+                            <a href="{% url 'my_tasks' %}?filter_by={{ filter }}" class="btn btn-outline-info mb-2">{{ label }}</a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
                 <div class="col-lg-3">
                     <h3>Разделы:</h3>
-                    <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split mb-2" data-bs-toggle="dropdown" aria-expanded="false">Задачи по категориям</button>
-                    <ul class="dropdown-menu">
-<!--                        {% for genre in genres %}-->
-<!--                        <li><a class="dropdown-item" href="{% url 'main' %}?genre_name={{ genre.title }}&{{ author_name }}">{{ genre.title }}</a></li>-->
-<!--                        {% endfor %}-->
-                    </ul>
-                    <a href="" class="btn btn-outline-danger mb-2">Задачи по приоритету</a>
+                    {% get_categories request.user %}
+                    {% get_priorities request.user %}
                 </div>
             </div>
         </div>
     </div>
     {% block body %} {% endblock %}
+    <div class="bg-dark mt-5">
+            <nav aria-label="PaginationBar">
+                {% if page_obj.object_list.count >= 1 %}
+                <ul class="pagination justify-content-center p-3">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a href="?page={{ page_obj.previous_page_number }}{{ filter_by }}" class="page-link"><i class="bi bi-arrow-left"></i></a>
+                    </li>
+                    {% endif %}
+                    {% for p in page_obj.paginator.page_range %}
+                        {% if page_obj.number == p %}
+                            <li class="page-item active" aria-current="page">
+                                <a href="?page={{ p }}{{ filter_by }}" class="page-link">{{ p }}</a>
+                            </li>
+                        {% elif p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
+                            <li class="page-item">
+                                <a href="?page={{ p }}{{ filter_by }}" class="page-link">{{ p }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a href="?page={{ page_obj.next_page_number }}{{ filter_by }}" class="page-link"><i class="bi bi-arrow-right"></i></a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+            </nav>
+        </div>
 </div>
 {% endblock %}
