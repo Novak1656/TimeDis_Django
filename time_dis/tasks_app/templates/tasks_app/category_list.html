@@ -1,8 +1,14 @@
 <button type="button" class="btn btn-outline-info dropdown-toggle dropdown-toggle-split mb-2" data-bs-toggle="dropdown" aria-expanded="false">Задачи по категориям</button>
 <ul class="dropdown-menu dropdown-menu-right">
+    <li>
+        <a class="dropdown-item" href="{% url 'my_tasks' %}">
+            Все&nbsp<span class="badge bg-danger rounded-pill">{{ all_cnt }}</span>
+        </a>
+    </li>
+    <div class="dropdown-divider"></div>
     {% for category in categories %}
         <li>
-            <a class="dropdown-item" href="">
+            <a class="dropdown-item" href="{% url 'tasks_by_category' category.title %}">
             {{ category.title }}
             &nbsp<span class="badge bg-danger rounded-pill">{{ category.cnt }}</span>
             </a>

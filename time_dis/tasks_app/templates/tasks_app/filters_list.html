@@ -1,7 +1,15 @@
 {% for filter, label in filers_list %}
     {% if filter == filter_by|slice:"11:" %}
+        {% if search_attrs %}
+        <a href="{{ url }}?{{ search_attrs }}" class="btn btn-outline-info mb-2 active">{{ label }}</a>
+        {% else %}
         <a href="{{ url }}" class="btn btn-outline-info mb-2 active">{{ label }}</a>
+        {% endif %}
     {% else %}
+        {% if search_attrs %}
+        <a href="{{ url }}?{{ search_attrs }}&filter_by={{ filter }}" class="btn btn-outline-info mb-2">{{ label }}</a>
+        {% else %}
         <a href="{{ url }}?filter_by={{ filter }}" class="btn btn-outline-info mb-2">{{ label }}</a>
+        {% endif %}
     {% endif %}
 {% endfor %}

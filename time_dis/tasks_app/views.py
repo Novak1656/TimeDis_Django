@@ -1,20 +1,22 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView
 from .models import Tasks
 from .forms import TasksForm
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 class TaskList(LoginRequiredMixin, ListView):
     model = Tasks
     template_name = 'tasks_app/task_list.html'
     context_object_name = 'tasks'
-    extra_context = {'title': 'задачи', 'filers_list': [('title', 'По названию'),
-                                                        ('created_on', 'По дате создания'),
-                                                        ('deadline', 'По сроку выполнения')]}
+    extra_context = {'title': 'задачи', 'url_name': reverse_lazy('my_tasks'),
+                     'filers_list': [('title', 'По названию'),
+                                     ('created_on', 'По дате создания'),
+                                     ('deadline', 'По сроку выполнения')]}
     paginate_by = 2
 
     def filter_by(self, order):
@@ -36,9 +38,9 @@ class TaskSearch(LoginRequiredMixin, ListView):
     template_name = 'tasks_app/task_list_search.html'
     paginate_by = 2
     context_object_name = 'tasks'
-    extra_context = {'filers_list': [('title', 'По названию'),
-                                     ('created_on', 'По дате создания'),
-                                     ('deadline', 'По сроку выполнения')]}
+    extra_context = {'url_name': reverse_lazy('task_search'), 'filers_list': [('title', 'По названию'),
+                                                                         ('created_on', 'По дате создания'),
+                                                                         ('deadline', 'По сроку выполнения')]}
     # Проблемы с поиском кириллицы можно решить при переходе на PostgreSQL
 
     def filter_by(self, order):
@@ -59,8 +61,20 @@ class TaskSearch(LoginRequiredMixin, ListView):
         return context
 
 
+@login_required
 def tasks_by_category(request, category):
-    return render(request, '')
+    def filter_by(order):
+        return request.user.tasks.filter(category__title=category).order_by(order).all()
+    data = {'title': f'задачи по категории {category}', 'url_name': reverse_lazy('tasks_by_category', args=[category])}
+    if request.GET.get('filter_by'):
+        tasks = filter_by(request.GET.get('filter_by'))
+        data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
+    else:
+        tasks = request.user.tasks.filter(category__title=category).all()
+    page_obj = Paginator(tasks, 2).get_page(request.GET.get('page', 1))
+    data['tasks'] = page_obj
+    data['page_obj'] = page_obj
+    return render(request, 'tasks_app/task_list.html', data)
 
 
 class TaskDetail(LoginRequiredMixin, DetailView):
