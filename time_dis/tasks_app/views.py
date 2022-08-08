@@ -65,7 +65,7 @@ class TaskSearch(LoginRequiredMixin, ListView):
 def tasks_by_category(request, category):
     def filter_by(order):
         return request.user.tasks.filter(category__title=category).order_by(order).all()
-    data = {'title': f'задачи по категории {category}', 'url_name': reverse_lazy('tasks_by_category', args=[category])}
+    data = {'title': f'задачи по категории: {category}', 'url_name': reverse_lazy('tasks_by_category', args=[category])}
     if request.GET.get('filter_by'):
         tasks = filter_by(request.GET.get('filter_by'))
         data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
@@ -74,6 +74,24 @@ def tasks_by_category(request, category):
     page_obj = Paginator(tasks, 2).get_page(request.GET.get('page', 1))
     data['tasks'] = page_obj
     data['page_obj'] = page_obj
+    return render(request, 'tasks_app/task_list.html', data)
+
+
+@login_required
+def tasks_by_priority(request, priority):
+    def filter_by(order):
+        return request.user.tasks.filter(priority__title=priority).order_by(order).all()
+    data = {'title': f'задачи по приоритету: {priority}',
+            'url_name': reverse_lazy('tasks_by_priority', args=[priority])}
+    if request.GET.get('filter_by'):
+        tasks = filter_by(request.GET.get('filter_by'))
+        data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
+    else:
+        tasks = Tasks.objects.all()
+        #tasks = request.user.tasks.filter(priority__title=priority).all()
+    page_obj = Paginator(tasks, 1).get_page(request.GET.get('page', 1))
+    data['page_obj'] = page_obj
+    data['tasks'] = page_obj
     return render(request, 'tasks_app/task_list.html', data)
 
 

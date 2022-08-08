@@ -11,7 +11,7 @@
                 <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
                     <div class="card-header border-bottom bg-{{ task.priority.tag }}">
                         <h1 class="card-text display-6">{{ task.category }}</h1>
-                        <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right"></a>
+                        <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
                     </div>
                     <div class="card-body">
                         <h1 class="card-text display-6">{{ task.title|title }}</h1>
