@@ -32,8 +32,8 @@
     </div>
     {% block body %} {% endblock %}
     <div class="bg-dark mt-5">
+        {% if page_obj|length > 0 %}
             <nav aria-label="PaginationBar">
-
                 <ul class="pagination justify-content-center p-3">
                     {% if page_obj.has_previous %}
                     <li class="page-item">
@@ -57,8 +57,8 @@
                     </li>
                     {% endif %}
                 </ul>
-
             </nav>
+        {% endif %}
         </div>
 </div>
 {% endblock %}

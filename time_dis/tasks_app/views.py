@@ -87,9 +87,8 @@ def tasks_by_priority(request, priority):
         tasks = filter_by(request.GET.get('filter_by'))
         data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
     else:
-        tasks = Tasks.objects.all()
-        #tasks = request.user.tasks.filter(priority__title=priority).all()
-    page_obj = Paginator(tasks, 1).get_page(request.GET.get('page', 1))
+        tasks = request.user.tasks.filter(priority__title=priority).all()
+    page_obj = Paginator(tasks, 2).get_page(request.GET.get('page', 1))
     data['page_obj'] = page_obj
     data['tasks'] = page_obj
     return render(request, 'tasks_app/task_list.html', data)

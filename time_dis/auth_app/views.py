@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import SetPasswordForm, PasswordChangeForm
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from .models import Users
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, LoginChangeForm, EmailChangeForm, UserInfoChangeForm
 
 
 def register(request):
@@ -73,6 +74,28 @@ def pass_recovery(request):
     return render(request, 'auth_app/pass_recovery.html')
 
 
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def user_settings(request):
+    if request.method == 'POST':
+        if 'login_success' in request.POST:
+            form = LoginChangeForm(request.POST, instance=request.user)
+        elif 'email_success' in request.POST:
+            form = EmailChangeForm(request.POST, instance=request.user)
+        elif 'info_success' in request.POST:
+            form = UserInfoChangeForm(request.POST, instance=request.user)
+        else:
+            form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_settings')
+    forms = {'password_form': PasswordChangeForm(user=request.user),
+             'login_from': LoginChangeForm(),
+             'email_form': EmailChangeForm(),
+             'user_info_form': UserInfoChangeForm(instance=request.user)}
+    return render(request, 'auth_app/user_settings.html', forms)

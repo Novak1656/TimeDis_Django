@@ -8,6 +8,6 @@ urlpatterns = [
     path('task/<str:slug>', TaskDetail.as_view(), name='task'),
     path('update_task/<str:slug>', update_task, name='update_task'),
     path('my_tasks/search/', TaskSearch.as_view(), name='task_search'),
-    path('my_tasks/<str:category>/', tasks_by_category, name='tasks_by_category'),
-    path('my_tasks/<str:priority>/', tasks_by_priority, name='tasks_by_priority'),
+    path('my_tasks/category/<str:category>/', tasks_by_category, name='tasks_by_category'),
+    path('my_tasks/priority/<str:priority>/', tasks_by_priority, name='tasks_by_priority'),
 ]

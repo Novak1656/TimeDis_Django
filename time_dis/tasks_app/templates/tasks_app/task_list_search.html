@@ -60,6 +60,7 @@
         </div>
     </div>
     <div class="bg-dark mt-5">
+        {% if page_obj|length > 0 %}
         <nav aria-label="PaginationBar">
             {% if page_obj.object_list.count >= 1 %}
             <ul class="pagination justify-content-center p-3">
@@ -87,6 +88,7 @@
             </ul>
             {% endif %}
         </nav>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
