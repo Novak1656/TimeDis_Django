@@ -134,4 +134,6 @@ def update_task(request, slug):
 def delete_task(request, slug):
     task = request.user.tasks.get(slug=slug)
     task.delete()
+    if request.META['HTTP_REFERER'] == f"http://{request.META['HTTP_HOST']}/":
+        return redirect('main')
     return redirect('my_tasks')

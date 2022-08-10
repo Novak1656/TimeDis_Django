@@ -38,6 +38,7 @@ class Tasks(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='tasks', verbose_name='Категория')
     priority = models.ForeignKey(Priority, on_delete=models.PROTECT, related_name='tasks', verbose_name='Приоритет')
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='tasks')
+    progress = models.BooleanField('Прогресс', default=0)
     deadline = models.DateTimeField('Срок выполнения', blank=True, null=True)
     created_on = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_on = models.DateTimeField('Дата изменения', auto_now=True)
