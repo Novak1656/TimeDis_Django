@@ -17,15 +17,15 @@ class TaskList(LoginRequiredMixin, ListView):
                      'filers_list': [('title', 'По названию'),
                                      ('created_on', 'По дате создания'),
                                      ('deadline', 'По сроку выполнения')]}
-    paginate_by = 2
+    paginate_by = 10
 
     def filter_by(self, order):
-        return Tasks.objects.filter(user=self.request.user).order_by(order).all()
+        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority').order_by(order).all()
 
     def get_queryset(self):
         if self.request.GET.get('filter_by'):
             return self.filter_by(self.request.GET.get('filter_by'))
-        return Tasks.objects.filter(user=self.request.user).all()
+        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority').all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(TaskList, self).get_context_data(**kwargs)
@@ -36,7 +36,7 @@ class TaskList(LoginRequiredMixin, ListView):
 
 class TaskSearch(LoginRequiredMixin, ListView):
     template_name = 'tasks_app/task_list_search.html'
-    paginate_by = 2
+    paginate_by = 10
     context_object_name = 'tasks'
     extra_context = {'url_name': reverse_lazy('task_search'), 'filers_list': [('title', 'По названию'),
                                                                          ('created_on', 'По дате создания'),
@@ -45,12 +45,14 @@ class TaskSearch(LoginRequiredMixin, ListView):
 
     def filter_by(self, order):
         return Tasks.objects.filter(Q(user=self.request.user) &
-                                    Q(title__icontains=self.request.GET.get('search_word'))).order_by(order).all()
+                                    Q(title__icontains=self.request.GET.get('search_word')))\
+            .select_related('category', 'priority').order_by(order).all()
 
     def get_queryset(self):
         if self.request.GET.get('filter_by'):
             return self.filter_by(self.request.GET.get('filter_by'))
-        return self.request.user.tasks.filter(title__icontains=self.request.GET.get('search_word')).all()
+        return self.request.user.tasks.filter(title__icontains=self.request.GET.get('search_word'))\
+            .select_related('category', 'priority').all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(TaskSearch, self).get_context_data(**kwargs)
@@ -64,14 +66,15 @@ class TaskSearch(LoginRequiredMixin, ListView):
 @login_required
 def tasks_by_category(request, category):
     def filter_by(order):
-        return request.user.tasks.filter(category__title=category).order_by(order).all()
+        return request.user.tasks.filter(category__title=category).select_related('category', 'priority')\
+            .order_by(order).all()
     data = {'title': f'задачи по категории: {category}', 'url_name': reverse_lazy('tasks_by_category', args=[category])}
     if request.GET.get('filter_by'):
         tasks = filter_by(request.GET.get('filter_by'))
         data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
     else:
-        tasks = request.user.tasks.filter(category__title=category).all()
-    page_obj = Paginator(tasks, 2).get_page(request.GET.get('page', 1))
+        tasks = request.user.tasks.filter(category__title=category).select_related('category', 'priority').all()
+    page_obj = Paginator(tasks, 10).get_page(request.GET.get('page', 1))
     data['tasks'] = page_obj
     data['page_obj'] = page_obj
     return render(request, 'tasks_app/task_list.html', data)
@@ -80,15 +83,16 @@ def tasks_by_category(request, category):
 @login_required
 def tasks_by_priority(request, priority):
     def filter_by(order):
-        return request.user.tasks.filter(priority__title=priority).order_by(order).all()
+        return request.user.tasks.filter(priority__title=priority).select_related('category', 'priority')\
+            .order_by(order).all()
     data = {'title': f'задачи по приоритету: {priority}',
             'url_name': reverse_lazy('tasks_by_priority', args=[priority])}
     if request.GET.get('filter_by'):
         tasks = filter_by(request.GET.get('filter_by'))
         data['filter_by'] = f"&filter_by={request.GET.get('filter_by')}"
     else:
-        tasks = request.user.tasks.filter(priority__title=priority).all()
-    page_obj = Paginator(tasks, 2).get_page(request.GET.get('page', 1))
+        tasks = request.user.tasks.filter(priority__title=priority).select_related('category', 'priority').all()
+    page_obj = Paginator(tasks, 10).get_page(request.GET.get('page', 1))
     data['page_obj'] = page_obj
     data['tasks'] = page_obj
     return render(request, 'tasks_app/task_list.html', data)

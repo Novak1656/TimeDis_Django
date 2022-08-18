@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'ckeditor',
+    'django_apscheduler',
     'auth_app.apps.AuthAppConfig',
     'main.apps.MainConfig',
     'tasks_app.apps.TasksAppConfig',
@@ -134,3 +135,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
 LOGIN_URL = 'login'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+SCHEDULER_DEFAULT = True
