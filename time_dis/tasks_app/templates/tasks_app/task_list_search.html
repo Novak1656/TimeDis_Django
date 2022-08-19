@@ -36,10 +36,17 @@
                 {% for task in tasks %}
                 <div class="col" align="center">
                     <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
+                        {% if task.failed %}
+                        <div class="card-header border-bottom bg-secondary">
+                            <h1 class="card-text display-6">Просрочено</h1>
+                            <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right"></a>
+                        </div>
+                        {% else %}
                         <div class="card-header border-bottom bg-{{ task.priority.tag }}">
                             <h1 class="card-text display-6">{{ task.category }}</h1>
                             <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right"></a>
                         </div>
+                        {% endif %}
                         <div class="card-body">
                             <h1 class="card-text display-6">{{ task.title|title }}</h1>
                             <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y" }}</p>

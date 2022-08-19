@@ -1,6 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import register_events, DjangoJobStore
 from main.views import reload_week_progress, daily_send_messages
+from tasks_app.views import chek_failed_tasks
 
 
 def start():
@@ -15,5 +16,9 @@ def start():
     @scheduler.scheduled_job('interval', days=1, name='auto_daily_send_messages')
     def auto_daily_send_messages():
         daily_send_messages()
+
+    @scheduler.scheduled_job('interval', days=1, name='auto_chek_failed_tasks')
+    def auto_chek_failed_tasks():
+        chek_failed_tasks()
 
     scheduler.start()

@@ -42,6 +42,7 @@ class Tasks(models.Model):
     deadline = models.DateTimeField('Срок выполнения', blank=True, null=True)
     created_on = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_on = models.DateTimeField('Дата изменения', auto_now=True)
+    failed = models.BooleanField('Просрочено', default=0)
 
     class Meta:
         verbose_name = 'Задача'
@@ -58,7 +59,6 @@ class Tasks(models.Model):
 
     def __str__(self):
         return f"{self.user}: {self.title}"
-
 
 
 '''

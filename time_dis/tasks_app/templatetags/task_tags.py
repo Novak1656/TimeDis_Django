@@ -1,8 +1,7 @@
 from django import template
 from ..models import Categories, Priority
-from django.db.models import Count, Q, Sum
+from django.db.models import Count
 from django.urls import reverse
-from django.utils.http import urlencode
 
 register = template.Library()
 
@@ -15,8 +14,7 @@ def search_task():
 
 @register.inclusion_tag('tasks_app/category_list.html')
 def get_categories(user):
-    categories = Categories.objects.annotate(cnt=Count('tasks', distinct=True)).filter(Q(tasks__user=user)
-                                                                                       & Q(cnt__gt=0))
+    categories = Categories.objects.filter(tasks__user=user).annotate(cnt=Count('tasks', distinct=True))
     return {'categories': categories, 'all_cnt': sum([elm.cnt for elm in categories])}
 
 
@@ -30,5 +28,5 @@ def get_priorities(user):
 def get_filters(url, cur_filter=None, search_attrs=None):
     data = {'url': url, 'filter_by': cur_filter, 'search_attrs': search_attrs,
             'filers_list': [('title', 'По названию'), ('created_on', 'По дате создания'),
-                            ('deadline', 'По сроку выполнения')]}
+                            ('deadline', 'По сроку выполнения'), ('-failed', 'По статусу')]}
     return data

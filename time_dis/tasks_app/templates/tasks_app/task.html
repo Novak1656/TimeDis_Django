@@ -5,9 +5,15 @@
 {% block content %}
 <div class="container">
     <div class="row">
+        {% if task.failed %}
+        <div class="bg-secondary">
+            <h1 class="display-5">{{ task.title }} | ПРОСРОЧЕНО</h1>
+        </div>
+        {% else %}
         <div class="bg-{{ task.priority.tag }}">
             <h1 class="display-5">{{ task.title }}</h1>
         </div>
+        {% endif %}
         <span>
         <p>Категория: {{ task.category }}</p>
     </span>

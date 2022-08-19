@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.timezone import now
 from django.views.generic import ListView, DetailView
 from .models import Tasks
 from .forms import TasksForm
@@ -9,14 +10,22 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 
 
+def chek_failed_tasks():
+    tasks = Tasks.objects.filter(deadline__date__lt=now().date()).all()
+    for task in tasks:
+        if task.progress == 1:
+            task.delete()
+        else:
+            task.failed = 1
+            task.save()
+    print('Проверка устаревших задач прошла успешно')
+
+
 class TaskList(LoginRequiredMixin, ListView):
     model = Tasks
     template_name = 'tasks_app/task_list.html'
     context_object_name = 'tasks'
-    extra_context = {'title': 'задачи', 'url_name': reverse_lazy('my_tasks'),
-                     'filers_list': [('title', 'По названию'),
-                                     ('created_on', 'По дате создания'),
-                                     ('deadline', 'По сроку выполнения')]}
+    extra_context = {'title': 'задачи', 'url_name': reverse_lazy('my_tasks')}
     paginate_by = 10
 
     def filter_by(self, order):
@@ -38,9 +47,7 @@ class TaskSearch(LoginRequiredMixin, ListView):
     template_name = 'tasks_app/task_list_search.html'
     paginate_by = 10
     context_object_name = 'tasks'
-    extra_context = {'url_name': reverse_lazy('task_search'), 'filers_list': [('title', 'По названию'),
-                                                                         ('created_on', 'По дате создания'),
-                                                                         ('deadline', 'По сроку выполнения')]}
+    extra_context = {'url_name': reverse_lazy('task_search')}
     # Проблемы с поиском кириллицы можно решить при переходе на PostgreSQL
 
     def filter_by(self, order):
