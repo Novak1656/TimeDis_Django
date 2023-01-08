@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %} Создание подзадачи {% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 15px">
+    <div class="text-center p-3">
+        <h1 class="display-4">Добавление подзадачи</h1>
+    </div>
+    <br>
+    <form method="post">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <br>
+        <div class="form-group">
+            <input type="submit" class="btn btn-outline-info" value="Добавить ещё подзадачу">
+            <input type="submit" class="btn btn-outline-success" name="create_finish" value="Завершить создание">
+        </div>
+    </form>
+</div>
+{% endblock %}

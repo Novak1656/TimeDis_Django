@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import ListView, DetailView
-from .models import Tasks
-from .forms import TasksForm
+from django.views.generic import ListView, DetailView, CreateView
+from .models import Tasks, Subtasks
+from .forms import TasksForm, SubtasksForm
 from django.db.models import Q
 from django.core.paginator import Paginator
 
@@ -122,6 +122,8 @@ def add_task(request):
             task = form.save(commit=False)
             task.user = request.user
             task.save()
+            if 'add_subtask' in request.POST:
+                return redirect('add_subtask', task_pk=task.pk)
             return redirect('my_tasks')
     else:
         form = TasksForm()
@@ -148,3 +150,27 @@ def delete_task(request, slug):
     if request.META['HTTP_REFERER'] == f"http://{request.META['HTTP_HOST']}/":
         return redirect('main')
     return redirect('my_tasks')
+
+
+class SubtaskCreateView(AccessMixin, CreateView):
+    model = Subtasks
+    template_name = 'tasks_app/subtask_create.html'
+    form_class = SubtasksForm
+    login_url = reverse_lazy('login')
+
+    def get_success_url(self):
+        if 'create_finish' in self.request.POST:
+            return reverse('my_tasks')
+        return reverse('add_subtask', kwargs={'task_pk': self.kwargs.get('task_pk')})
+
+    def form_valid(self, form):
+        subtask = form.save(commit=False)
+        task = Tasks.objects.get(pk=self.kwargs.get('task_pk'))
+        subtask.task = task
+        subtask.save()
+        return super(SubtaskCreateView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(SubtaskCreateView, self).get_context_data(**kwargs)
+        context['task_pk'] = self.kwargs.get('task_pk')
+        return context
