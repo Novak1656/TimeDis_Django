@@ -45,7 +45,7 @@ def pass_recovery(request):
     if request.user.is_authenticated:
         return redirect('main')
     if request.GET.get('user_hash'):
-        user = Users.objects.get(password=request.GET.get('user_hash'))
+        user = Users.objects.get(password=request.GET.get('user_hash').replace(' ', '+'))
         if request.method == 'POST':
             form = SetPasswordForm(user, request.POST)
             if form.is_valid():
@@ -57,14 +57,17 @@ def pass_recovery(request):
     if request.method == 'POST':
         if 'email' in request.POST:
             user_mail = request.POST.get('email')
-            user_hash = Users.objects.values('username', 'password').filter(email=user_mail).first()
+            user_hash = Users.objects.filter(email=user_mail).values_list('password', flat=True).first()
             if user_hash:
-                url = request.build_absolute_uri(f'{request.path}?user_hash={user_hash["password"]}')
+                url = request.build_absolute_uri(f'{request.path}?user_hash={user_hash}')
                 mes = f'Для восстановления пароля перейдите по ссылке:\n{url}'
                 mail = send_mail('Восстановление пароля', mes,
-                                 settings.EMAIL_HOST_USER, [user_mail], fail_silently=False)
+                                 f'TimeDis <{settings.EMAIL_HOST_USER}>', [user_mail], fail_silently=False)
                 if mail:
-                    messages.success(request, 'Дальнейшие инструкции для восстановления пароля отправлены на вашу почту')
+                    messages.success(
+                        request,
+                        'Дальнейшие инструкции для восстановления пароля отправлены на вашу почту'
+                    )
                 else:
                     messages.error(request, 'Повторите попытку позже')
                 return redirect('pass_recovery')
