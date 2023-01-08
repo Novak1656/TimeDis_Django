@@ -30,3 +30,9 @@ def get_filters(url, cur_filter=None, search_attrs=None):
             'filers_list': [('title', 'По названию'), ('created_on', 'По дате создания'),
                             ('deadline', 'По сроку выполнения'), ('-failed', 'По статусу')]}
     return data
+
+
+@register.simple_tag
+def get_subtasks_info(subtasks):
+    unfinished_count = len(subtasks) - len(subtasks.filter(progress=0))
+    return f'{unfinished_count}/{len(subtasks)}'

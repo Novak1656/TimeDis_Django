@@ -1,5 +1,7 @@
 {% extends 'tasks_app/base_tasks_app.html' %}
 
+{% load task_tags %}
+
 {% block title %} {{ block.super }} {{ title }} {% endblock %}
 
 {% block body %}
@@ -23,7 +25,7 @@
                     <div class="card-body">
                         <p class="card-text fs-3">{{ task.title|title }}</p>
                         {% if task.subtasks.all.exists %}
-                        <p>Число подзадач: {{ task.subtasks.all.count }}</p>
+                        <p><i class="bi bi-check-square"></i> {% get_subtasks_info task.subtasks.all %}</p>
                         {% endif %}
                         {% if task.deadline %}
                         <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y" }}</p>
