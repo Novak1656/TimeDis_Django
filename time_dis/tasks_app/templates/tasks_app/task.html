@@ -14,15 +14,39 @@
             <h1 class="display-5">{{ task.title }}</h1>
         </div>
         {% endif %}
-        <span>
-        <p>Категория: {{ task.category }}</p>
-    </span>
-        <p class="display-7">{{ task.comment }}</p>
-        <span class="">
-        <p>Срок выполнения: {{ task.deadline|date:"d.m.Y" }}</p>
-    </span>
+
+        <p class="fs-3">Категория: {{ task.category }}</p>
+
+        {% if task.comment %}
+        <p class="fs-3"> Подробности задачи: {{ task.comment }}</p>
+        {% endif %}
+
+        {% if subtasks %}
+        <ul>
+            <p class="fs-3">Подзадачи:</p>
+            {% for subtask in subtasks %}
+            <li>
+                <p class="fs-4">{{ subtask.title }}</p>
+                {% if subtask.comment %}
+                <p>Подробности подзадачи: {{ subtask.comment }}</p>
+                {% endif %}
+                <div class="btn-group btn-group-horizontal">
+                    <a href="{% url 'update_subtask' task.slug subtask.pk %}" class="btn btn-outline-warning">Редактировать</a>
+                    <a href="{% url 'delete_subtask' task.slug subtask.pk %}" class="btn btn-outline-danger">Удалить</a>
+                </div>
+                <hr>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if task.deadline %}
+        <p class="fs-3">Срок выполнения: {{ task.deadline|date:"d.m.Y" }}</p>
+        {% endif %}
+
         <div class="btn-group btn-group-horizontal">
             <a href="{% url 'update_task' task.slug %}" class="btn btn-outline-warning">Редактировать</a>
+            <a href="{% url 'new_subtask' task.slug %}" class="btn btn-outline-info">Добавить подзадачу</a>
             <a href="{% url 'delete_task' task.slug %}" class="btn btn-outline-danger">Удалить</a>
         </div>
     </div>

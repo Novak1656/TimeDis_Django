@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
 from .models import Tasks, Subtasks
 from .forms import TasksForm, SubtasksForm
 from django.db.models import Q
@@ -29,12 +29,14 @@ class TaskList(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def filter_by(self, order):
-        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority').order_by(order).all()
+        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority')\
+            .prefetch_related('subtasks').order_by(order).all()
 
     def get_queryset(self):
         if self.request.GET.get('filter_by'):
             return self.filter_by(self.request.GET.get('filter_by'))
-        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority').all()
+        return Tasks.objects.filter(user=self.request.user).select_related('category', 'priority')\
+            .prefetch_related('subtasks').all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(TaskList, self).get_context_data(**kwargs)
@@ -111,7 +113,14 @@ class TaskDetail(LoginRequiredMixin, DetailView):
     context_object_name = 'task'
 
     def get_queryset(self):
-        return self.request.user.tasks
+        return Tasks.objects.prefetch_related('subtasks').select_related('category', 'priority').filter(
+            user=self.request.user
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskDetail, self).get_context_data(**kwargs)
+        context['subtasks'] = self.object.subtasks.all()
+        return context
 
 
 @login_required
@@ -174,3 +183,45 @@ class SubtaskCreateView(AccessMixin, CreateView):
         context = super(SubtaskCreateView, self).get_context_data(**kwargs)
         context['task_pk'] = self.kwargs.get('task_pk')
         return context
+
+
+class NewSubtaskView(AccessMixin, CreateView):
+    model = Subtasks
+    template_name = 'tasks_app/new_subtask.html'
+    form_class = SubtasksForm
+    login_url = reverse_lazy('login')
+
+    def get_success_url(self):
+        return reverse('task', kwargs={'slug': self.kwargs.get('task_slug')})
+
+    def form_valid(self, form):
+        subtask = form.save(commit=False)
+        task = Tasks.objects.get(slug=self.kwargs.get('task_slug'))
+        subtask.task = task
+        subtask.save()
+        return super(NewSubtaskView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(NewSubtaskView, self).get_context_data(**kwargs)
+        task = Tasks.objects.get(slug=self.kwargs.get('task_slug'))
+        context['task_title'] = task.title
+        return context
+
+
+class SubtaskUpdateView(AccessMixin, UpdateView):
+    model = Subtasks
+    template_name = 'tasks_app/update_subtask.html'
+    form_class = SubtasksForm
+    login_url = reverse_lazy('login')
+
+    def get_success_url(self):
+        return reverse('task', kwargs={'slug': self.kwargs.get('task_slug')})
+
+
+class SubtaskDeleteView(AccessMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('task', kwargs={'slug': self.kwargs.get('task_slug')})
+
+    def get(self, request, *args, **kwargs):
+        Subtasks.objects.get(pk=self.kwargs.get('pk')).delete()
+        return super(SubtaskDeleteView, self).get(request, *args, **kwargs)

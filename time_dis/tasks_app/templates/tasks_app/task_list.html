@@ -22,7 +22,12 @@
                     {% endif %}
                     <div class="card-body">
                         <p class="card-text fs-3">{{ task.title|title }}</p>
+                        {% if task.subtasks.all.exists %}
+                        <p>Число подзадач: {{ task.subtasks.all.count }}</p>
+                        {% endif %}
+                        {% if task.deadline %}
                         <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y" }}</p>
+                        {% endif %}
                     </div>
                     <div class="card-footer">
                         <div class="btn-group w-100">

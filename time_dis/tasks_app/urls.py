@@ -11,4 +11,15 @@ urlpatterns = [
     path('my_tasks/search/', TaskSearch.as_view(), name='task_search'),
     path('my_tasks/category/<str:category>/', tasks_by_category, name='tasks_by_category'),
     path('my_tasks/priority/<str:priority>/', tasks_by_priority, name='tasks_by_priority'),
+    path('task/<str:task_slug>/subtask/create/', login_required(NewSubtaskView.as_view()), name='new_subtask'),
+    path(
+        'task/<str:task_slug>/subtask/update/<int:pk>/',
+        login_required(SubtaskUpdateView.as_view()),
+        name='update_subtask'
+    ),
+    path(
+        'task/<str:task_slug>/subtask/delete/<int:pk>/',
+        login_required(SubtaskDeleteView.as_view()),
+        name='delete_subtask'
+    )
 ]
