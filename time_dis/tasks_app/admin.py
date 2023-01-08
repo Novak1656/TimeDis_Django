@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import Tasks, Categories, Priority
+from .models import Tasks, Categories, Priority, Subtasks
 
 
+@admin.register(Tasks)
 class TasksAdmin(admin.ModelAdmin):
     list_display = ('id', 'slug', 'title', 'category', 'priority', 'user', 'deadline', 'created_on', 'progress',
                     'failed',)
-    list_filter = ('category', 'title', 'priority', 'user', 'created_on', 'deadline', 'failed',)
+    list_filter = ('category', 'priority', 'failed',)
     search_fields = ('title',)
     list_display_links = ('id', 'slug', 'title',)
     prepopulated_fields = {'slug': ('title',)}
@@ -14,9 +15,13 @@ class TasksAdmin(admin.ModelAdmin):
 @admin.register(Categories, Priority)
 class CategoriesAdmin(admin.ModelAdmin):
     list_display = ('id', 'title',)
-    list_filter = ('title',)
     search_fields = ('title',)
     list_display_links = ('id', 'title',)
 
 
-admin.site.register(Tasks, TasksAdmin)
+@admin.register(Subtasks)
+class SubtasksAdmin(admin.ModelAdmin):
+    list_display = ('id', 'task', 'title', 'progress',)
+    list_filter = ('progress',)
+    search_fields = ('title',)
+    list_display_links = ('id', 'title',)

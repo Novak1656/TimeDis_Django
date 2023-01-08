@@ -61,7 +61,30 @@ class Tasks(models.Model):
         return f"{self.user}: {self.title}"
 
 
-'''
-class Reminds(models.Model):
----- 
-'''
+class Subtasks(models.Model):
+    task = models.ForeignKey(
+        verbose_name='Задача',
+        to=Tasks,
+        on_delete=models.CASCADE,
+        related_name='subtasks'
+    )
+    title = models.CharField(
+        verbose_name='Название',
+        max_length=255
+    )
+    comment = models.TextField(
+        verbose_name='Подробности',
+        blank=True
+    )
+    progress = models.BooleanField(
+        'Прогресс',
+        default=0
+    )
+
+    class Meta:
+        verbose_name = 'Подзадача'
+        verbose_name_plural = 'Подзадачи'
+        ordering = ['title']
+
+    def __str__(self):
+        return self.title
