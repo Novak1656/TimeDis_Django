@@ -1,0 +1,120 @@
+{% load task_tags %}
+
+<div class="row gy-5">
+    {% if not tasks_without_deadline and not tasks_list %}
+    <p class="text-center display-6">У вас ещё нет задач
+        <br><a class="btn btn-outline-success w-25 text-center mt-3" href="{% url 'add_task' %}">Создать задачу</a>
+    </p>
+    {% else %}
+    {% for task in tasks_without_deadline %}
+    <div class="col" align="center">
+        <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
+            {% if task.failed %}
+            <div class="card-header border-bottom bg-secondary">
+                <p class="card-text fs-3">Просрочено</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% else %}
+            <div class="card-header border-bottom bg-{{ task.priority.tag }}">
+                <p class="card-text fs-3">{{ task.category }}</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <p class="card-text fs-3">{{ task.title|title }}</p>
+                {% if task.subtasks.all.exists %}
+                <p><i class="bi bi-check-square"></i> {% get_subtasks_info task.subtasks.all %}</p>
+                {% endif %}
+                {% if task.deadline %}
+                <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y" }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <div class="btn-group w-100">
+                    <a class="btn btn-outline-info w-100" href="{{ task.get_absolute_url }}">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+    {% if striped_by == 'datetime_stripe' %}
+    {% for task_date, tasks_by_time in tasks_list.items %}
+    <h3 class="bg-secondary rounded-top">Задачи за {{ task_date }}</h3>
+    {% for task_time, tasks in tasks_by_time.items %}
+    <h4>Задачи на следующий час: {{ task_time }}:00 <hr></h4>
+    {% for task in tasks %}
+    <div class="col" align="center">
+        <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
+            {% if task.failed %}
+            <div class="card-header border-bottom bg-secondary">
+                <p class="card-text fs-3">Просрочено</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% else %}
+            <div class="card-header border-bottom bg-{{ task.priority.tag }}">
+                <p class="card-text fs-3">{{ task.category }}</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <p class="card-text fs-3">{{ task.title|title }}</p>
+                {% if task.subtasks.all.exists %}
+                <p><i class="bi bi-check-square"></i> {% get_subtasks_info task.subtasks.all %}</p>
+                {% endif %}
+                {% if task.deadline %}
+                <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y H:i" }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <div class="btn-group w-100">
+                    <a class="btn btn-outline-info w-100" href="{{ task.get_absolute_url }}">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
+
+    {% else %}
+
+    {% for task_date, tasks in tasks_list.items %}
+    <h3 class="bg-secondary rounded-top"> Задачи за {{ task_date }}</h3>
+    {% for task in tasks %}
+    <div class="col" align="center">
+        <div class="card mb-4 h-100 bg-dark rounded border" style="width: 20rem;">
+            {% if task.failed %}
+            <div class="card-header border-bottom bg-secondary">
+                <p class="card-text fs-3">Просрочено</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% else %}
+            <div class="card-header border-bottom bg-{{ task.priority.tag }}">
+                <p class="card-text fs-3">{{ task.category }}</p>
+                <a href="{% url 'delete_task' task.slug %}" class="btn btn-close btn-close-white text-right" style="position: absolute; right: 5px; top: 5px;"></a>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <p class="card-text fs-3">{{ task.title|title }}</p>
+                {% if task.subtasks.all.exists %}
+                <p><i class="bi bi-check-square"></i> {% get_subtasks_info task.subtasks.all %}</p>
+                {% endif %}
+                {% if task.deadline %}
+                <p class="card-text">Срок выполнения: до {{ task.deadline|date:"d.m.Y H:i" }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <div class="btn-group w-100">
+                    <a class="btn btn-outline-info w-100" href="{{ task.get_absolute_url }}">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+
+    {% endif %}
+</div>

@@ -5,8 +5,35 @@
 {% block title %} {{ block.super }} {{ title }} {% endblock %}
 
 {% block body %}
+<ul class="nav nav-tabs mt-3">
+    <li class="nav-item">
+        {% if striped_by == 'date_stripe' %}
+        <a class="nav-link active" aria-current="page" href="{% url 'my_tasks' %}">
+            Разделение по дате
+        </a>
+        {% else %}
+        <a class="nav-link text-white" aria-current="page" href="?striped_by=date_stripe">
+            Разделение по дате
+        </a>
+        {% endif %}
+    </li>
+    <li class="nav-item">
+        {% if striped_by == 'datetime_stripe' %}
+        <a class="nav-link active " href="{% url 'my_tasks' %}">
+            Разделение по дате и времени
+        </a>
+        {% else %}
+        <a class="nav-link text-white" href="?striped_by=datetime_stripe">
+            Разделение по дате и времени
+        </a>
+        {% endif %}
+    </li>
+</ul>
 <div class="album py-5 bg-dark rounded">
     <div class="container">
+        {% if striped_by %}
+        {% get_striped_tasks_by_datetime tasks_list=tasks stripe_type=striped_by %}
+        {% else %}
         <div class="row gy-5">
             {% for task in tasks %}
             <div class="col" align="center">
@@ -44,6 +71,7 @@
             </p>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

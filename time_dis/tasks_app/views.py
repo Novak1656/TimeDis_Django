@@ -42,6 +42,10 @@ class TaskList(LoginRequiredMixin, ListView):
         context = super(TaskList, self).get_context_data(**kwargs)
         if self.request.GET.get('filter_by'):
             context['filter_by'] = f"&filter_by={self.request.GET.get('filter_by')}"
+        striped_by = self.request.GET.get('striped_by')
+        if striped_by:
+            context['striped_by_url'] = f"&striped_by={striped_by}"
+        context['striped_by'] = striped_by
         return context
 
 

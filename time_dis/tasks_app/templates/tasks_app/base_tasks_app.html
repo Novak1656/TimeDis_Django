@@ -37,23 +37,23 @@
                 <ul class="pagination justify-content-center p-3">
                     {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a href="?page={{ page_obj.previous_page_number }}{{ filter_by }}" class="page-link"><i class="bi bi-arrow-left"></i></a>
+                        <a href="?page={{ page_obj.previous_page_number }}{{ filter_by }}{{ striped_by_url }}" class="page-link"><i class="bi bi-arrow-left"></i></a>
                     </li>
                     {% endif %}
                     {% for p in page_obj.paginator.page_range %}
                         {% if page_obj.number == p %}
                             <li class="page-item active" aria-current="page">
-                                <a href="?page={{ p }}{{ filter_by }}" class="page-link">{{ p }}</a>
+                                <a href="?page={{ p }}{{ filter_by }}{{ striped_by_url }}" class="page-link">{{ p }}</a>
                             </li>
                         {% elif p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
                             <li class="page-item">
-                                <a href="?page={{ p }}{{ filter_by }}" class="page-link">{{ p }}</a>
+                                <a href="?page={{ p }}{{ filter_by }}{{ striped_by_url }}" class="page-link">{{ p }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a href="?page={{ page_obj.next_page_number }}{{ filter_by }}" class="page-link"><i class="bi bi-arrow-right"></i></a>
+                        <a href="?page={{ page_obj.next_page_number }}{{ filter_by }}{{ striped_by_url }}" class="page-link"><i class="bi bi-arrow-right"></i></a>
                     </li>
                     {% endif %}
                 </ul>
