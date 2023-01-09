@@ -42,6 +42,7 @@ class TaskList(LoginRequiredMixin, ListView):
         context = super(TaskList, self).get_context_data(**kwargs)
         if self.request.GET.get('filter_by'):
             context['filter_by'] = f"&filter_by={self.request.GET.get('filter_by')}"
+
         striped_by = self.request.GET.get('striped_by')
         if striped_by:
             context['striped_by_url'] = f"&striped_by={striped_by}"
@@ -73,6 +74,11 @@ class TaskSearch(LoginRequiredMixin, ListView):
         context['title'] = self.request.GET.get('search_word')
         if self.request.GET.get('filter_by'):
             context['filter_by'] = f"&filter_by={self.request.GET.get('filter_by')}"
+
+        striped_by = self.request.GET.get('striped_by')
+        if striped_by:
+            context['striped_by_url'] = f"&striped_by={striped_by}"
+        context['striped_by'] = striped_by
         return context
 
 
@@ -90,6 +96,11 @@ def tasks_by_category(request, category):
     page_obj = Paginator(tasks, 10).get_page(request.GET.get('page', 1))
     data['tasks'] = page_obj
     data['page_obj'] = page_obj
+
+    striped_by = request.GET.get('striped_by')
+    if striped_by:
+        data['striped_by_url'] = f"&striped_by={striped_by}"
+    data['striped_by'] = striped_by
     return render(request, 'tasks_app/task_list.html', data)
 
 
@@ -108,6 +119,11 @@ def tasks_by_priority(request, priority):
     page_obj = Paginator(tasks, 10).get_page(request.GET.get('page', 1))
     data['page_obj'] = page_obj
     data['tasks'] = page_obj
+
+    striped_by = request.GET.get('striped_by')
+    if striped_by:
+        data['striped_by_url'] = f"&striped_by={striped_by}"
+    data['striped_by'] = striped_by
     return render(request, 'tasks_app/task_list.html', data)
 
 
