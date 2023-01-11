@@ -1,16 +1,21 @@
+from datetime import timedelta, date, datetime
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mass_mail
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, F
 from django.urls import reverse_lazy
-from django.utils.timezone import now, localdate
-from django.views.generic import RedirectView
+from django.utils.safestring import mark_safe
+from django.utils.timezone import localdate
+from django.views.generic import RedirectView, TemplateView
 
 from .forms import TransferForm
 from .models import TasksProgress
 from auth_app.models import Users
 from tasks_app.models import Tasks, Subtasks
+import calendar
+from .utils import Calendar
 
 
 def reload_week_progress():
@@ -95,3 +100,41 @@ class SuccessSubtaskView(RedirectView):
         subtask.progress = 1
         subtask.save()
         return super(SuccessSubtaskView, self).get(request, *args, **kwargs)
+
+
+class CalendarView(TemplateView):
+    template_name = 'main/task_calendar.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CalendarView, self).get_context_data(**kwargs)
+        d = get_date(self.request.GET.get('month', None))
+        month = self.request.GET.get('month', None)
+        y, m = d.year, d.month
+        if month:
+            y, m = list(map(int, month.split('-')))
+        cal = Calendar(y, m, self.request.user)
+        html_cal = cal.formatmonth(withyear=True)
+        context['task_calendar'] = mark_safe(html_cal)
+        context['prev_month'] = prev_month(d)
+        context['next_month'] = next_month(d)
+        return context
+
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()
+
+
+def prev_month(d):
+    first = d.replace(day=1)
+    prev_month_value = first - timedelta(days=1)
+    return 'month=' + str(prev_month_value.year) + '-' + str(prev_month_value.month)
+
+
+def next_month(d):
+    days_in_month = calendar.monthrange(d.year, d.month)[1]
+    last = d.replace(day=days_in_month)
+    next_month_value = last + timedelta(days=1)
+    return 'month=' + str(next_month_value.year) + '-' + str(next_month_value.month)
