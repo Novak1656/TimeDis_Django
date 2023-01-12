@@ -15,7 +15,10 @@ class Calendar(HTMLCalendar):
     def formatday(self, day, tasks):
         if day in tasks.keys():
             days_tasks = ''.join(
-                f'<li> <a href="{reverse("task", kwargs={"slug": task.slug})}">{task.title}</a> </li>'
+                f'<li><a href="{reverse("task", kwargs={"slug": task.slug})}" class="text-{task.priority.tag}">{task.title}</a></li>'
+                if not task.progress
+                else
+                f'<li><s><a href="{reverse("task", kwargs={"slug": task.slug})}" class="text-{task.priority.tag}">{task.title}</a></s></li>'
                 for task in tasks.get(day)
             )
         else:
@@ -29,13 +32,11 @@ class Calendar(HTMLCalendar):
         return f'<tr> {week} </tr>'
 
     def formatmonth(self, withyear=True):
-        tasks = Tasks.objects.filter(Q(deadline__year=self.year) & Q(deadline__month=self.month), user=self.user)
-        print(tasks)
+        tasks = Tasks.objects.select_related('priority').filter(Q(deadline__year=self.year) & Q(deadline__month=self.month), user=self.user)
         days_with_tasks = {task.deadline.day: list() for task in tasks}
 
         for task in tasks:
             days_with_tasks[task.deadline.day].append(task)
-        print(days_with_tasks)
 
         cal = f'<table border="0" cellpadding="0" cellspacing="0" class="calendar">\n'
         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'

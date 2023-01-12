@@ -3,25 +3,24 @@
 {% block title %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-bottom: 30px">
+<div class="container border-bottom" style="margin-bottom: 30px">
     <div>
         <h2 class="display-6" >Прогресс за день</h2>
     </div>
 
     {% if pb_data != 100 %}
-    <div class="progress" style="height: 20px;">
+    <div class="progress mb-3" style="height: 20px;">
         <div class="progress-bar bg-success" role="progressbar" style="width: {{ pb_data }}%" aria-valuenow="{{ daily1|length }}" aria-valuemin="0" aria-valuemax="100">Осталось задач: {{ daily2|length }}</div>
     </div>
     {% else %}
-    <div class="progress" style="height: 20px;">
+    <div class="progress mb-3" style="height: 20px;">
         <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="{{ daily|length }}">Все задачи на сегодня выполнены</div>
     </div>
     {% endif %}
 </div>
 
-<div class="pricing-header p-3 pb-md-4 mx-auto text-center border-top">
+<div class="pricing-header text-center">
     <h1 class="display-4 fw-normal">TimeDis</h1>
-    <p class="fs-5 text-muted"><b>{{ request.user.username|title }}</b>, добро пожаловать в TimeDis! Это тайм-менеджмент приложение поможет вам с планированием ваших дел и напомнит о том, что вы должны сделать сегодня. Начните распределение вашего времени прямо сейчас!</p>
 </div>
 
 <div class="container-fluid text-center">
