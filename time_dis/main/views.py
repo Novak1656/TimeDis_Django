@@ -18,9 +18,16 @@ import calendar
 from .utils import Calendar
 
 
-def reload_week_progress():
-    TasksProgress.objects.all().delete()
-    print('Еженедельный прогресс пользователей был обновлён')
+def reload_progress():
+    cur_date = localdate()
+    if cur_date.month == 1 and cur_date.day == 1:
+        # Year reload
+        TasksProgress.objects.filter(progress_range='YEAR').delete()
+    if cur_date.day == 1:
+        # Month reload
+        TasksProgress.objects.filter(progress_range='MONTH').delete()
+    TasksProgress.objects.filter(progress_range='WEEK').delete()
+    print('Прогресс пользователей был обновлён')
 
 
 def daily_send_messages():
@@ -82,13 +89,18 @@ class SuccessTaskView(RedirectView):
                 updated_subtasks.append(subtask)
             Subtasks.objects.bulk_update(updated_subtasks, ['progress'])
 
-        t_progress = request.user.task_progress.filter(category_name=success_task.category.title).first()
-        if t_progress:
+        updated_progress = list()
+        for progress_range, _ in TasksProgress.PROGRESS_RANGE:
+            t_progress, _ = TasksProgress.objects.get_or_create(
+                user=request.user,
+                category_name=success_task.category.title,
+                progress_range=progress_range,
+                defaults={'task_finished': 0}
+            )
             t_progress.task_finished = F('task_finished') + 1
-            t_progress.save()
-            t_progress.refresh_from_db()
-        else:
-            TasksProgress.objects.create(user=request.user, category_name=success_task.category.title, task_finished=1)
+            updated_progress.append(t_progress)
+        if updated_progress:
+            TasksProgress.objects.bulk_update(updated_progress, ['task_finished'])
         return super(SuccessTaskView, self).get(request, *args, **kwargs)
 
 
