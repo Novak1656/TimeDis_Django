@@ -3,9 +3,9 @@ from .models import TasksProgress
 
 
 class TasksProgressAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'category_name', 'task_finished',)
+    list_display = ('id', 'user', 'category_name', 'task_finished', 'progress_range')
     list_display_links = ('id',)
-    list_filter = ('user', 'category_name', 'task_finished',)
+    list_filter = ('category_name',)
     search_fields = ('user', 'category_name',)
 
 

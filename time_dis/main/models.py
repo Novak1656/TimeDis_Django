@@ -3,14 +3,30 @@ from auth_app.models import Users
 
 
 class TasksProgress(models.Model):
-    user = models.ForeignKey(verbose_name='Пользователь', to=Users,
-                             on_delete=models.CASCADE, related_name='task_progress')
-    category_name = models.CharField(verbose_name='Категория', max_length=250)
-    task_finished = models.IntegerField(verbose_name='Выполнено задач')
+    PROGRESS_RANGE = [('WEEK', 'За неделю'), ('MONTH', 'За месяц'), ('YEAR', 'За год')]
+
+    user = models.ForeignKey(
+        verbose_name='Пользователь',
+        to=Users,
+        on_delete=models.CASCADE,
+        related_name='task_progress'
+    )
+    category_name = models.CharField(
+        verbose_name='Категория',
+        max_length=250
+    )
+    task_finished = models.IntegerField(
+        verbose_name='Выполнено задач'
+    )
+    progress_range = models.CharField(
+        verbose_name='Диапазон',
+        max_length=15,
+        default='WEEK'
+    )
 
     class Meta:
-        verbose_name = 'Прогресс задачи'
-        verbose_name_plural = 'Прогресс задач'
+        verbose_name = 'Прогресс по задачам'
+        verbose_name_plural = 'Прогресс по задачам'
         ordering = ['user']
 
     def __str__(self):
