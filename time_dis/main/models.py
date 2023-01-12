@@ -26,6 +26,7 @@ class TasksProgress(models.Model):
     progress_range = models.CharField(
         verbose_name='Диапазон',
         max_length=15,
+        choices=PROGRESS_RANGE,
         default='WEEK'
     )
 
