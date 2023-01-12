@@ -32,11 +32,14 @@ class Priority(models.Model):
 
 
 class Tasks(models.Model):
+    REMIND_TYPE = [('Never', 'Никогда'), ('OneTime', 'Один раз'), ('EveryDay', 'Каждый день')]
+
     slug = models.SlugField(max_length=250, null=True, allow_unicode=True)
     title = models.CharField('Название', max_length=250)
     comment = models.TextField('Подробности', blank=True)
     category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='tasks', verbose_name='Категория')
     priority = models.ForeignKey(Priority, on_delete=models.PROTECT, related_name='tasks', verbose_name='Приоритет')
+    remind_type = models.CharField(verbose_name='Напоминать', max_length=20, default='OneTime')
     user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='tasks')
     progress = models.BooleanField('Прогресс', default=0)
     deadline = models.DateTimeField('Срок выполнения', blank=True, null=True)

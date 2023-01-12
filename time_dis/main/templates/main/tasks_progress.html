@@ -10,17 +10,17 @@
     <ul class="nav nav-tabs mt-3 mb-3">
         <li class="nav-item">
             <a class="nav-link {% if not progress_range %}active{% else %}text-white{% endif %}" aria-current="page" href="{% url 'my_progress' %}">
-                Недели
+                За неделю
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if progress_range == 'month' %}active{% else %}text-white{% endif %}" aria-current="page" href="?progress_range=month">
-                Месяца
+                За месяц
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if progress_range == 'year' %}active{% else %}text-white{% endif %}" aria-current="page" href="?progress_range=year">
-                Года
+                За год
             </a>
         </li>
     </ul>
