@@ -5,19 +5,33 @@ from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
 from .models import Tasks, Subtasks
+from main.models import TasksProgress
 from .forms import TasksForm, SubtasksForm
-from django.db.models import Q
+from django.db.models import Q, F
 from django.core.paginator import Paginator
 
 
 def chek_failed_tasks():
     tasks = Tasks.objects.filter(deadline__date__lt=now().date()).all()
+    updated_progress = list()
     for task in tasks:
         if task.progress == 1:
             task.delete()
+        elif task.failed == 1:
+            continue
         else:
             task.failed = 1
             task.save()
+            for progress_range, _ in TasksProgress.PROGRESS_RANGE:
+                t_progress, _ = TasksProgress.objects.get_or_create(
+                    user=task.user,
+                    category_name=task.category.title,
+                    progress_range=progress_range
+                )
+                t_progress.task_failed = F('task_failed') + 1
+                updated_progress.append(t_progress)
+    if updated_progress:
+        TasksProgress.objects.bulk_update(updated_progress, ['task_failed'])
     print('Проверка устаревших задач прошла успешно')
 
 

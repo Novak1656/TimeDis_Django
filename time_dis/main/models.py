@@ -16,7 +16,12 @@ class TasksProgress(models.Model):
         max_length=250
     )
     task_finished = models.IntegerField(
-        verbose_name='Выполнено задач'
+        verbose_name='Выполнено задач',
+        default=0
+    )
+    task_failed = models.IntegerField(
+        verbose_name='Просрочено задач',
+        default=0
     )
     progress_range = models.CharField(
         verbose_name='Диапазон',

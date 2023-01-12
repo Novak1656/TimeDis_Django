@@ -1,0 +1,155 @@
+{% extends 'main/base_main.html' %}
+
+{% block title %}Моя продуктивность{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center p-3">
+        <h1 class="display-4">Моя продуктивность</h1>
+    </div>
+    <ul class="nav nav-tabs mt-3 mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if not progress_range %}active{% else %}text-white{% endif %}" aria-current="page" href="{% url 'my_progress' %}">
+                Недели
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if progress_range == 'month' %}active{% else %}text-white{% endif %}" aria-current="page" href="?progress_range=month">
+                Месяца
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if progress_range == 'year' %}active{% else %}text-white{% endif %}" aria-current="page" href="?progress_range=year">
+                Года
+            </a>
+        </li>
+    </ul>
+    <div class="bg-dark border border-end-0 border-bottom-0 border-top-0">
+        <div class="container">
+            {% if chart_queryset %}
+            <div class="row">
+                <div class="col">
+                    {% if progress_range == 'month' %}
+                    <p class="fs-4">За текущий месяц вы выполнили задачи следующих категорий:</p>
+                    {% elif progress_range == 'year' %}
+                    <p class="fs-4">За текущий год вы выполнили задачи следующих категорий:</p>
+                    {% else %}
+                    <p class="fs-4">За текущую неделю вы выполнили задачи следующих категорий:</p>
+                    {% endif %}
+                    {% for item in chart_queryset %}
+                    {% if item.task_finished > 0 %}
+                    <p class="fs-5">{{ forloop.counter }}. {{ item.category_name }}: {{ item.task_finished }}</p>
+                    {% endif %}
+                    {% endfor %}
+                    <hr>
+                    <p class="fs-5">Кол-во выполненных задач: {{ finished_count }}</p>
+                </div>
+                <div class="col border-start">
+                    <canvas id="myChart1"></canvas>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    {% if progress_range == 'month' %}
+                    <p class="fs-4">За текущий месяц невыполненными остались задачи следующих категорий:</p>
+                    {% elif progress_range == 'year' %}
+                    <p class="fs-4">За текущий год невыполненными остались задачи следующих категорий:</p>
+                    {% else %}
+                    <p class="fs-4">За текущую неделю невыполненными остались задачи следующих категорий:</p>
+                    {% endif %}
+                    {% for item in chart_queryset %}
+                    {% if item.task_failed > 0 %}
+                    <p class="fs-5">{{ forloop.counter }}. {{ item.category_name }}: {{ item.task_failed }}</p>
+                    {% endif %}
+                    {% endfor %}
+                    <hr>
+                    <p class="fs-5">Кол-во невыполненных задач: {{ failed_count }}</p>
+                </div>
+                <div class="col border-start">
+                    <canvas id="myChart2"></canvas>
+                </div>
+            </div>
+            {% else %}
+            <div class="container text-center">
+                <h3 class="display-6">Вы ещё не выполнили ни одной задачи.</h3>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+const ctx = document.getElementById('myChart1').getContext('2d');
+const myChart1 = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: '# of Votes',
+            data: {{ chart_data|safe }},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+const ctx_2 = document.getElementById('myChart2').getContext('2d');
+const myChart2 = new Chart(ctx_2, {
+    type: 'pie',
+    data: {
+        labels: {{ chart_failed_labels|safe }},
+        datasets: [{
+            label: '# of Votes',
+            data: {{ chart_failed_data|safe }},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

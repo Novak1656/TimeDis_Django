@@ -63,14 +63,31 @@ def main(request):
     else:
         pb_data = 100
     form = TransferForm()
+    context = dict(daily=daily, daily1=daily_fin, daily2=daily_not_fin, pb_data=pb_data, form=form)
+    return render(request, 'main/main_menu.html', context)
 
-    chart_queryset = request.user.task_progress.order_by('task_finished').all()
-    chart_labels = [item.category_name for item in chart_queryset]
-    chart_data = [item.task_finished for item in chart_queryset]
-    return render(request, 'main/main_menu.html', {'daily': daily, 'daily1': daily_fin,
-                                                   'daily2': daily_not_fin, 'pb_data': pb_data,
-                                                   'form': form, 'chart_labels': chart_labels,
-                                                   'chart_data': chart_data, 'chart_queryset': chart_queryset})
+
+class TasksProgressView(TemplateView):
+    template_name = 'main/tasks_progress.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TasksProgressView, self).get_context_data(**kwargs)
+        progress_range = self.request.GET.get('progress_range')
+        if progress_range == 'month':
+            chart_queryset = self.request.user.task_progress.filter(progress_range='MONTH').order_by('-task_finished')
+        elif progress_range == 'year':
+            chart_queryset = self.request.user.task_progress.filter(progress_range='YEAR').order_by('-task_finished')
+        else:
+            chart_queryset = self.request.user.task_progress.filter(progress_range='WEEK').order_by('-task_finished')
+        context['chart_labels'] = [item.category_name for item in chart_queryset if item.task_finished > 0]
+        context['chart_data'] = [item.task_finished for item in chart_queryset if item.task_finished > 0]
+        context['chart_failed_labels'] = [item.category_name for item in chart_queryset if item.task_failed > 0]
+        context['chart_failed_data'] = [item.task_failed for item in chart_queryset if item.task_failed > 0]
+        context['chart_queryset'] = chart_queryset
+        context['progress_range'] = progress_range
+        context['failed_count'] = sum(item.task_failed for item in chart_queryset)
+        context['finished_count'] = sum(item.task_finished for item in chart_queryset)
+        return context
 
 
 class SuccessTaskView(RedirectView):
